@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jsp/jstl/core" version="2.0">
+	<jsp:directive.page contentType="text/html; charset=UTF-8" 
+		pageEncoding="UTF-8" session="false"/>
+	<jsp:output doctype-root-element="html"
+		doctype-public="-//W3C//DTD XHTML 1.0 Transitional//EN"
+		doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"
+		omit-xml-declaration="true" />
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+ <link rel="StyleSheet" href="res/mc.css" type="text/css" title="cse4413" media="screen, print"/>
+ <title>Mortgage Calculator A1</title>
+</head>
+<body>
+<form method="POST" action="">
+	<fieldset>
+		<legend>Mortgage Calculator /A1</legend>
+		<c:if test="${not empty error}">
+			<p id="message">${error}</p>
+		</c:if>
+		<label accesskey="p" for="principle">Principle
+			<span class="tip">(present value in dollars)</span>
+		</label>
+      	<input onblur="grabRates(this);" value="${principle}" name="principle" id="principle" type="text"/>
+      	<p id="principleMsg" class="error"><sup>*</sup></p>
+      	<label accesskey="a" for="amortization">Amortization
+      		<span class="tip">(mortgage period in years)</span>
+      	</label>
+      	<span class="radio">
+      		<input value="20" checked="checked" name="amortization" id="amortization20" type="radio"/>
+      		<label for="amortization20">20</label>
+      		<input value="25" name="amortization" id="amortization25" type="radio"/>
+      		<label for="amortization25">25</label>
+      		<input value="30" name="amortization" id="amortization30" type="radio"/>
+      		<label for="amortization30">30</label>
+      	</span>
+      	<label accesskey="i" for="interest">Interest
+      		<span class="tip">(the term's fixed rate as %)</span>
+      	</label>
+      	<input value="${interest}" name="interest" id="interest" type="text"/>
+      	<p id="interestMsg" class="error"><sup>*</sup></p>
+      	<input value="Monthly Payment" name="doit" id="do" type="submit"/>
+    </fieldset>
+</form>
+</body>
+</html>
+</jsp:root>
