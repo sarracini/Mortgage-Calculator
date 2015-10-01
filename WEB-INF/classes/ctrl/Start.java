@@ -1,7 +1,10 @@
 package ctrl;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -67,10 +70,26 @@ public class Start extends HttpServlet
 			
 			s.setAttribute("principle", p);
 			s.setAttribute("amortization", a);
-			
+					
 			try {
-				request.setAttribute("interest", m.validateInterest(r));
-				request.setAttribute("monthly", String.format("%.2f", m.computePayment(p, a, r)));
+				String[] range = r.split("-");
+				if (range.length == 2) {
+					Map<String, String> map = new HashMap<String, String>();
+					double lower = m.validateInterest(range[0]);
+					double upper = m.validateInterest(range[1]);
+					int steps = (int) Math.round((upper - lower + 0.1)*10);
+					for (int i = 0; i < steps; i++){
+						r = String.valueOf(lower);
+						map.put(String.format("%.1f",lower), String.format("%.2f", m.computePayment(p, a, r)));
+						lower = lower + 0.1;						
+					}
+					request.setAttribute("range", true);
+					request.setAttribute("monthly", map);
+				} else {
+					request.setAttribute("range", false);
+					request.setAttribute("interest", m.validateInterest(r));
+					request.setAttribute("monthly", String.format("%.2f", m.computePayment(p, a, r)));
+				}
 				jsp = "Result.jspx";
 			} catch (Throwable e) {
 				request.setAttribute("error", e.getMessage());

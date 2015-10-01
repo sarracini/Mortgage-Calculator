@@ -13,6 +13,7 @@
 </head>
 <body>
 <form method="POST" action="">
+<div id="form">
 	<fieldset>
 		<legend>Mortgage Calculator /A1</legend>
 		<c:if test="${not empty error}">
@@ -41,6 +42,7 @@
       	<p id="interestMsg" class="error"><sup>*</sup></p>
       	<input value="Monthly Payment" name="doit" id="do" type="submit"/>
     </fieldset>
+    </div>
 </form>
 </body>
 </html>

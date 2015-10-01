@@ -13,8 +13,10 @@
 	font-size: 75%;
 	font-weight: normal;
 }
-
-form
+#notform {
+	background-color:white;
+}
+#form
 {
 	width:275px;;
 	background: -webkit-gradient(linear, bottom, left 35%, from(#CCCCCC), to(#EEEEEE));
@@ -99,6 +101,9 @@ textarea
 {
 	background:#fff;
 	color:#09C;
+}
+#smallbutton{
+	width:20%;
 }
 
 textarea:focus, input:focus 
