@@ -16,6 +16,7 @@
 #notform {
 	background-color:white;
 }
+
 #form
 {
 	width:275px;;
@@ -102,7 +103,7 @@ textarea
 	background:#fff;
 	color:#09C;
 }
-#smallbutton{
+#smallbutton {
 	width:20%;
 }
 

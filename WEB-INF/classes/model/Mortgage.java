@@ -1,6 +1,8 @@
 package model;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class Mortgage
 {
@@ -23,7 +25,7 @@ public class Mortgage
 	}
 	
 	public double validateInterest(String r) throws Exception {
-		try {
+		try {	
 			double result = Double.parseDouble(r);
 			if (result <= 0 || result > 100) {
 				throw new IOException("Interest out of range!");
@@ -48,26 +50,35 @@ public class Mortgage
 		}
 	}
 	
-	public double getRange(String s) throws Exception {
-		String[] range = s.split("-");
-		if (range.length == 2) {
-			try {
-				double lower = this.validateInterest(range[0]);
-				double upper = this.validateInterest(range[1]);
-				return (upper - lower + RANGE_STEP)*100;
-			} catch (Exception e){
-				
-			}
+	public void validateRange(double upper, double lower) throws Exception {
+		if (upper < lower) {
+			throw new Exception("Range is invalid!");
 		}
-		return this.validateInterest(s);
+	}
+	
+	public Map<String, String> computeRangePayment(String p, String a, String r) throws Exception {
+		Map<String, String> map = new LinkedHashMap<String, String>();
+		String[] range = r.split("-");
+		try {
+			double lower = this.validateInterest(range[0]);
+			double upper = this.validateInterest(range[1]);
+			this.validateRange(upper, lower);
+			int steps = (int) Math.round((upper - lower + RANGE_STEP)*10);
+			for (int i = 0; i < steps; i++){
+				r = String.valueOf(lower);
+				map.put(String.format("%.1f",lower), String.format("%.2f", this.computePayment(p, a, r)));
+				lower = lower + RANGE_STEP;		
+			}
+			return map;
+		} catch (Exception e){
+			throw new Exception(e.getMessage());
+		}
 	}
 		
 	public double computePayment(String p, String a, String r) throws Exception {
 		double principle = this.validatePrinciple(p);
 		double amortization = this.validateAmortization(a);
-		//double interest = this.getRange(r);
 		double interest = this.validateInterest(r);
-		//System.out.println("INTEREST: " + interest);
 		
 		interest = this.validateInterest(r);
 		interest = interest/12/100;

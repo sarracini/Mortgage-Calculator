@@ -1,10 +1,6 @@
 package ctrl;
 
 import java.io.IOException;
-import java.text.DecimalFormat;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -18,7 +14,7 @@ import model.Mortgage;
 /**
  * Servlet implementation class Start
  */
-@WebServlet(urlPatterns = {"/Start"})
+@WebServlet(urlPatterns = {"/Start", "/Start/branch"})
 public class Start extends HttpServlet
 {
 	private static final long serialVersionUID = 1L;
@@ -48,8 +44,16 @@ public class Start extends HttpServlet
 		HttpSession s = request.getSession();
 		Mortgage m = (Mortgage) this.getServletContext().getAttribute("model");
 		String jsp, r, p, a;
+		String branch = request.getServletPath();
+		boolean isBranch = false;
 		
-		if (request.getParameter("doit") == null || request.getParameter("restart") != null){
+		request.setAttribute("branch", false);
+		if (branch.equals("/Start/branch")) {
+			request.setAttribute("branch", true);
+			isBranch = true;
+		}
+		
+		if (request.getParameter("doit") == null || request.getParameter("restart") != null) {
 			jsp = "UI.jspx";
 		} else {
 			p = (String) s.getAttribute("principle");
@@ -73,18 +77,10 @@ public class Start extends HttpServlet
 					
 			try {
 				String[] range = r.split("-");
-				if (range.length == 2) {
-					Map<String, String> map = new HashMap<String, String>();
-					double lower = m.validateInterest(range[0]);
-					double upper = m.validateInterest(range[1]);
-					int steps = (int) Math.round((upper - lower + 0.1)*10);
-					for (int i = 0; i < steps; i++){
-						r = String.valueOf(lower);
-						map.put(String.format("%.1f",lower), String.format("%.2f", m.computePayment(p, a, r)));
-						lower = lower + 0.1;						
-					}
+				if (range.length == 2 && isBranch) {
 					request.setAttribute("range", true);
-					request.setAttribute("monthly", map);
+					request.setAttribute("monthly", m.computeRangePayment(p, a, r));
+					
 				} else {
 					request.setAttribute("range", false);
 					request.setAttribute("interest", m.validateInterest(r));
