@@ -47,6 +47,7 @@ public class Start extends HttpServlet
 		String branch = request.getServletPath();
 		boolean isBranch = false;
 		
+		// if you are visiting 'Start/branch', show a different UI
 		request.setAttribute("branch", false);
 		if (branch.equals("/Start/branch")) {
 			request.setAttribute("branch", true);
@@ -56,9 +57,11 @@ public class Start extends HttpServlet
 		if (request.getParameter("doit") == null || request.getParameter("restart") != null) {
 			jsp = "UI.jspx";
 		} else {
+			// get the session attribute (will be null on fresh visit)
 			p = (String) s.getAttribute("principle");
 			a = (String) s.getAttribute("amortization");
 			
+			// if it's a fresh visit, get values from parameters
 			if (p == null) {
 				p = request.getParameter("principle");
 			}
@@ -66,22 +69,27 @@ public class Start extends HttpServlet
 				a = request.getParameter("amortization");
 			}
 			
+			// always get the interest from the request parameter
 			r = request.getParameter("interest");
 			
+			// set the request attributes
 			request.setAttribute("principle", p);
 			request.setAttribute("amortization", a);
 			request.setAttribute("interest", r);
 			
+			// set the session attributes
 			s.setAttribute("principle", p);
 			s.setAttribute("amortization", a);
 					
 			try {
+				// if interest is a range, compute range
 				String[] range = r.split("-");
 				if (range.length == 2 && isBranch) {
 					request.setAttribute("range", true);
 					request.setAttribute("monthly", m.computeRangePayment(p, a, r));
 					
 				} else {
+					// if interest is not a range, compute interest
 					request.setAttribute("range", false);
 					request.setAttribute("interest", m.validateInterest(r));
 					request.setAttribute("monthly", String.format("%.2f", m.computePayment(p, a, r)));
