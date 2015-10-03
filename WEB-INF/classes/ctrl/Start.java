@@ -14,7 +14,7 @@ import model.Mortgage;
 /**
  * Servlet implementation class Start
  */
-@WebServlet(urlPatterns = {"/Start", "/Start/branch"})
+@WebServlet(urlPatterns = {"/Start/*"})
 public class Start extends HttpServlet
 {
 	private static final long serialVersionUID = 1L;
@@ -44,12 +44,12 @@ public class Start extends HttpServlet
 		HttpSession s = request.getSession();
 		Mortgage m = (Mortgage) this.getServletContext().getAttribute("model");
 		String jsp, r, p, a;
-		String branch = request.getServletPath();
+		String branch = request.getPathInfo();
 		boolean isBranch = false;
 		
 		// if you are visiting 'Start/branch', show a different UI
 		request.setAttribute("branch", false);
-		if (branch.equals("/Start/branch")) {
+		if (branch != null && branch.equals("/branch")) {
 			request.setAttribute("branch", true);
 			isBranch = true;
 		}
