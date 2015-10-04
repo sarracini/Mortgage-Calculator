@@ -80,7 +80,6 @@ public class Mortgage
 		double amortization = this.validateAmortization(a);
 		double interest = this.validateInterest(r);
 		
-		interest = this.validateInterest(r);
 		interest = interest/12/100;
 		amortization = amortization*12;
 		double power = Math.pow((1+interest), ((-1)*amortization));
