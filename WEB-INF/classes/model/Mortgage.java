@@ -1,15 +1,19 @@
 package model;
 
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Mortgage
 {
-	private static double RANGE_STEP = 0.1;
+	private MortgageDAO dao; 
 	
-	public Mortgage() {
-		
+	public Mortgage() throws Exception {
+		try {
+			this.dao = new MortgageDAO();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public double validatePrinciple(String p) throws Exception {
@@ -25,7 +29,7 @@ public class Mortgage
 	}
 	
 	public double validateInterest(String r) throws Exception {
-		try {	
+		try {
 			double result = Double.parseDouble(r);
 			if (result <= 0 || result > 100) {
 				throw new IOException("Interest out of range!");
@@ -48,31 +52,21 @@ public class Mortgage
 		} catch (NumberFormatException e) {
 			throw new NumberFormatException("Amortization is not numeric!");
 		}
+
 	}
 	
-	public void validateRange(double upper, double lower) throws Exception {
-		if (upper < lower) {
-			throw new Exception("Range is invalid!");
-		}
-	}
-	
-	public Map<String, String> computeRangePayment(String p, String a, String r) throws Exception {
-		Map<String, String> map = new LinkedHashMap<String, String>();
-		String[] range = r.split("-");
+	public List<String> getBanks() {
+		List<String> allBanks = new ArrayList<String>();
 		try {
-			double lower = this.validateInterest(range[0]);
-			double upper = this.validateInterest(range[1]);
-			this.validateRange(upper, lower);
-			int steps = (int) Math.round((upper - lower + RANGE_STEP)*10);
-			for (int i = 0; i < steps; i++){
-				r = String.valueOf(lower);
-				map.put(String.format("%.1f",lower), String.format("%.2f", this.computePayment(p, a, r)));
-				lower = lower + RANGE_STEP;		
+			List<MortgageBean> banks = dao.getBanks();
+			for (int i = 0; i < banks.size(); i++) {
+				String bankName = banks.get(i).getBank();
+				allBanks.add(bankName);
 			}
-			return map;
-		} catch (Exception e){
-			throw new Exception(e.getMessage());
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+		return allBanks;
 	}
 		
 	public double computePayment(String p, String a, String r) throws Exception {

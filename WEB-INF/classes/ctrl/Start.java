@@ -1,6 +1,7 @@
 package ctrl;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -14,7 +15,7 @@ import model.Mortgage;
 /**
  * Servlet implementation class Start
  */
-@WebServlet(urlPatterns = {"/Start/*"})
+@WebServlet(urlPatterns = {"/Start"})
 public class Start extends HttpServlet
 {
 	private static final long serialVersionUID = 1L;
@@ -29,8 +30,12 @@ public class Start extends HttpServlet
 	
 	public void init() throws ServletException {
 		super.init();
-		Mortgage model = new Mortgage();
-		this.getServletContext().setAttribute("model", model);
+		try {
+			Mortgage model = new Mortgage();
+			this.getServletContext().setAttribute("model", model);
+		} catch (Exception e) {
+			throw new ServletException();
+		}
 	}
 
 	/**
@@ -44,29 +49,22 @@ public class Start extends HttpServlet
 		HttpSession s = request.getSession();
 		Mortgage m = (Mortgage) this.getServletContext().getAttribute("model");
 		String jsp, r, p, a;
-		String branch = request.getPathInfo();
-		boolean isBranch = false;
-		
-		// if you are visiting 'Start/branch', show a different UI
-		request.setAttribute("branch", false);
-		if (branch != null && branch.equals("/branch")) {
-			request.setAttribute("branch", true);
-			isBranch = true;
-		}
-		
-		if (request.getParameter("doit") == null || request.getParameter("restart") != null) {
+		List<String> allBanks = m.getBanks();
+
+		if (request.getParameter("doit") == null || request.getParameter("restart") != null){
+			request.setAttribute("banks", allBanks);
 			jsp = "UI.jspx";
 		} else {
-			// get the session attribute (will be null on fresh visit)
-			p = (String) s.getAttribute("principle");
-			a = (String) s.getAttribute("amortization");
 			
-			// if it's a fresh visit, get values from parameters
+			p = request.getParameter("principle");
+			a = request.getParameter("amortization");
+			
+			// get values from session, if you are recomputing
 			if (p == null) {
-				p = request.getParameter("principle");
+				p = (String) s.getAttribute("principle");
 			}
 			if (a == null) {
-				a = request.getParameter("amortization");
+				a = (String) s.getAttribute("amortization");	
 			}
 			
 			// always get the interest from the request parameter
@@ -80,20 +78,10 @@ public class Start extends HttpServlet
 			// set the session attributes
 			s.setAttribute("principle", p);
 			s.setAttribute("amortization", a);
-					
+			
 			try {
-				// if interest is a range, compute range
-				String[] range = r.split("-");
-				if (range.length == 2 && isBranch) {
-					request.setAttribute("range", true);
-					request.setAttribute("monthly", m.computeRangePayment(p, a, r));
-					
-				} else {
-					// if interest is not a range, compute interest
-					request.setAttribute("range", false);
-					request.setAttribute("interest", m.validateInterest(r));
-					request.setAttribute("monthly", String.format("%.2f", m.computePayment(p, a, r)));
-				}
+				request.setAttribute("interest", m.validateInterest(r));
+				request.setAttribute("monthly", String.format("%.2f", m.computePayment(p, a, r)));
 				jsp = "Result.jspx";
 			} catch (Throwable e) {
 				request.setAttribute("error", e.getMessage());
