@@ -49,15 +49,23 @@ public class Start extends HttpServlet
 		HttpSession s = request.getSession();
 		Mortgage m = (Mortgage) this.getServletContext().getAttribute("model");
 		String jsp, r, p, a;
-		List<String> allBanks = m.getBanks();
+		double rate = 0;
+		boolean useBankRate = false;
+		
+		try {
+			List<String> allBanks = m.getBanks();
+			request.setAttribute("banks", allBanks);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		if (request.getParameter("doit") == null || request.getParameter("restart") != null){
-			request.setAttribute("banks", allBanks);
 			jsp = "UI.jspx";
 		} else {
 			
 			p = request.getParameter("principle");
 			a = request.getParameter("amortization");
+			r = request.getParameter("interest");
 			
 			// get values from session, if you are recomputing
 			if (p == null) {
@@ -67,9 +75,20 @@ public class Start extends HttpServlet
 				a = (String) s.getAttribute("amortization");	
 			}
 			
-			// always get the interest from the request parameter
-			r = request.getParameter("interest");
-			
+			// if there is no interest parameter, use the selected bank
+			if (r == "") {
+				try {
+					String bank = request.getParameter("bank").toString();
+					double principle = Double.parseDouble(p);
+					int amort = Integer.parseInt(a);
+					rate = m.getRate(principle, amort, bank);	
+					request.setAttribute("rate", rate);
+					request.setAttribute("bankName", bank);
+					useBankRate = true;
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
 			// set the request attributes
 			request.setAttribute("principle", p);
 			request.setAttribute("amortization", a);
@@ -80,8 +99,13 @@ public class Start extends HttpServlet
 			s.setAttribute("amortization", a);
 			
 			try {
-				request.setAttribute("interest", m.validateInterest(r));
-				request.setAttribute("monthly", String.format("%.2f", m.computePayment(p, a, r)));
+				if (useBankRate) {
+					request.setAttribute("monthly", String.format("%.2f", m.computePayment(p, a, String.valueOf(rate))));
+
+				} else {
+					request.setAttribute("interest", m.validateInterest(r));
+					request.setAttribute("monthly", String.format("%.2f", m.computePayment(p, a, r)));
+				}
 				jsp = "Result.jspx";
 			} catch (Throwable e) {
 				request.setAttribute("error", e.getMessage());

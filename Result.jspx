@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jsp/jstl/core" version="2.0">
 	<jsp:directive.page contentType="text/html; charset=UTF-8" 
 		pageEncoding="UTF-8" session="false"/>
 	<jsp:output doctype-root-element="html"
@@ -13,7 +13,15 @@
 </head>
 <body>
 <form method="POST" action="">
-For an interest rate of ${interest}%, the monthly payment is: $${monthly}
+<c:choose>
+	<c:when test="${not empty rate}">
+		For an interest rate of ${bankName}, the monthly payment is: $${monthly}
+	</c:when>
+	<c:otherwise>
+		For an interest rate of ${interest}%, the monthly payment is: $${monthly}	
+	</c:otherwise>
+</c:choose>
+
 <input name="restart" value="Start Over" id="do" type="submit"/><br/><br/>
 Or try a different annual interest rate:
 <input name="interest" type="text"/><input name="doit" value="Recompute" id="do" type="submit"/></form>

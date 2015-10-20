@@ -12,7 +12,7 @@ public class Mortgage
 		try {
 			this.dao = new MortgageDAO();
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new Exception();
 		}
 	}
 	
@@ -52,10 +52,9 @@ public class Mortgage
 		} catch (NumberFormatException e) {
 			throw new NumberFormatException("Amortization is not numeric!");
 		}
-
 	}
 	
-	public List<String> getBanks() {
+	public List<String> getBanks() throws Exception {
 		List<String> allBanks = new ArrayList<String>();
 		try {
 			List<MortgageBean> banks = dao.getBanks();
@@ -63,10 +62,20 @@ public class Mortgage
 				String bankName = banks.get(i).getBank();
 				allBanks.add(bankName);
 			}
+			return allBanks;
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new Exception();
 		}
-		return allBanks;
+	}
+	
+	public double getRate(double principle, int amort, String bank) throws Exception {
+		try {
+			MortgageBean bean = dao.getRate(principle, amort, bank);
+			double rate = bean.getRate();
+			return rate;
+		} catch (Exception e) {
+			throw new Exception();
+		}
 	}
 		
 	public double computePayment(String p, String a, String r) throws Exception {
