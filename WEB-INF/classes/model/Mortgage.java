@@ -12,7 +12,7 @@ public class Mortgage
 		try {
 			this.dao = new MortgageDAO();
 		} catch (Exception e) {
-			throw new Exception();
+			throw new Exception("Cannot create Mortgage DAO");
 		}
 	}
 	
@@ -64,7 +64,7 @@ public class Mortgage
 			}
 			return allBanks;
 		} catch (Exception e) {
-			throw new Exception();
+			throw new IOException("No offers availble for this bank");
 		}
 	}
 	
@@ -74,7 +74,7 @@ public class Mortgage
 			double rate = bean.getRate();
 			return rate;
 		} catch (Exception e) {
-			throw new Exception();
+			throw new IOException("No offers availble for this bank");
 		}
 	}
 		

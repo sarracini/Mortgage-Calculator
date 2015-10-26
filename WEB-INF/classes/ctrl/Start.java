@@ -23,8 +23,7 @@ public class Start extends HttpServlet
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public Start()
-	{
+	public Start() {
 		super();
 	}
 	
@@ -43,25 +42,26 @@ public class Start extends HttpServlet
 	 *      response)
 	 */
 	protected void doGet(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException
-	{
+			HttpServletResponse response) throws ServletException, IOException {
+		
 		response.setContentType("text/plain");
 		HttpSession s = request.getSession();
 		Mortgage m = (Mortgage) this.getServletContext().getAttribute("model");
 		String jsp, r, p, a;
-		double rate = 0;
-		boolean useBankRate = false;
 		
+		// get all the banks and display them
 		try {
 			List<String> allBanks = m.getBanks();
 			request.setAttribute("banks", allBanks);
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new IOException("No offers available from this bank");
 		}
 
+		// if it's a fresh visit, show the UI
 		if (request.getParameter("doit") == null || request.getParameter("restart") != null){
 			jsp = "UI.jspx";
-		} else {
+		} 
+		else {
 			
 			p = request.getParameter("principle");
 			a = request.getParameter("amortization");
@@ -75,20 +75,6 @@ public class Start extends HttpServlet
 				a = (String) s.getAttribute("amortization");	
 			}
 			
-			// if there is no interest parameter, use the selected bank
-			if (r == "") {
-				try {
-					String bank = request.getParameter("bank").toString();
-					double principle = Double.parseDouble(p);
-					int amort = Integer.parseInt(a);
-					rate = m.getRate(principle, amort, bank);	
-					request.setAttribute("rate", rate);
-					request.setAttribute("bankName", bank);
-					useBankRate = true;
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
 			// set the request attributes
 			request.setAttribute("principle", p);
 			request.setAttribute("amortization", a);
@@ -99,20 +85,29 @@ public class Start extends HttpServlet
 			s.setAttribute("amortization", a);
 			
 			try {
-				if (useBankRate) {
-					request.setAttribute("monthly", String.format("%.2f", m.computePayment(p, a, String.valueOf(rate))));
-
-				} else {
+				// if there is no interest parameter, use the selected bank
+				if (r == "") {
+					String bank = request.getParameter("bank").toString();
+					double principle = Double.parseDouble(p);
+					int amort = Integer.parseInt(a);
+					double rate = m.getRate(principle, amort, bank);	
+					request.setAttribute("rate", rate);
+					request.setAttribute("bankName", bank);
+					request.setAttribute("monthly", String.format("%.2f", m.computePayment(p, a, String.valueOf(rate))));	
+					jsp = "Result.jspx";
+				} 
+				// if there is an interest, compute the payment normally
+				else {
 					request.setAttribute("interest", m.validateInterest(r));
 					request.setAttribute("monthly", String.format("%.2f", m.computePayment(p, a, r)));
+					jsp = "Result.jspx";	
 				}
-				jsp = "Result.jspx";
-			} catch (Throwable e) {
+			} catch (Exception e) {
+				// display the correct error message
 				request.setAttribute("error", e.getMessage());
 				jsp = "UI.jspx";
 			}
 		}
-				
 		this.getServletContext().getRequestDispatcher("/" + jsp).forward(request, response);
 	}
 
@@ -121,8 +116,8 @@ public class Start extends HttpServlet
 	 *      response)
 	 */
 	protected void doPost(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException
-	{
+			HttpServletResponse response) throws ServletException, IOException {
+		
 		this.doGet(request, response);
 	}
 

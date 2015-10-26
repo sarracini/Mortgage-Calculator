@@ -1,5 +1,6 @@
 package model;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -43,7 +44,7 @@ public class MortgageDAO
 			rs.close();
 			return bean;
 		} catch (Exception e) {
-			throw new Exception();
+			throw new IOException("No offers availble for this bank");
 		}
 	}
 	
@@ -64,7 +65,7 @@ public class MortgageDAO
 			rs.close();
 			return banks;
 		} catch (Exception e) {
-			throw new Exception();
+			throw new IOException("No offers availble for this bank");
 		}
 	}
 }

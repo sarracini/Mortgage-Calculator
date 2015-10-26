@@ -11,15 +11,18 @@
     <welcome-file>Start</welcome-file>
   </welcome-file-list>
   <context-param>
-  	<param-name>principle</param-name>
-  	<param-value>10</param-value>
-   </context-param>
-   <context-param>
-  	<param-name>interest</param-name>
-  	<param-value>10</param-value>
-   </context-param>
-   <context-param>
-  	<param-name>amortization</param-name>
-  	<param-value>10</param-value>
+    <param-name>principle</param-name>
+    <param-value>10</param-value>
   </context-param>
+  <context-param>
+    <param-name>interest</param-name>
+    <param-value>10</param-value>
+  </context-param>
+  <context-param>
+    <param-name>amortization</param-name>
+    <param-value>10</param-value>
+  </context-param>
+  <listener>
+  <listener-class>analytics.maxPrinciple</listener-class>
+  </listener>
 </web-app>
