@@ -23,6 +23,6 @@
     <param-value>10</param-value>
   </context-param>
   <listener>
-  <listener-class>analytics.maxPrinciple</listener-class>
+    <listener-class>analytics.maxPrinciple</listener-class>
   </listener>
 </web-app>

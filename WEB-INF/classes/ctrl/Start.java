@@ -58,11 +58,11 @@ public class Start extends HttpServlet
 		}
 
 		// if it's a fresh visit, show the UI
-		if (request.getParameter("doit") == null || request.getParameter("restart") != null){
+		if (request.getParameter("doit") == null || request.getParameter("restart") != null) {
 			jsp = "UI.jspx";
 		} 
 		else {
-			
+			jsp = "Result.jspx";
 			p = request.getParameter("principle");
 			a = request.getParameter("amortization");
 			r = request.getParameter("interest");
@@ -85,8 +85,14 @@ public class Start extends HttpServlet
 			s.setAttribute("amortization", a);
 			
 			try {
+				
+				// stupid hack to re-validate principle when using listeners
+		    	boolean isValid = false;
+		    	m.validatePrinciple(p);
+		    	isValid = true;
+ 	
 				// if there is no interest parameter, use the selected bank
-				if (r == "") {
+				if (r == "" && isValid) {
 					String bank = request.getParameter("bank").toString();
 					double principle = Double.parseDouble(p);
 					int amort = Integer.parseInt(a);
@@ -94,13 +100,11 @@ public class Start extends HttpServlet
 					request.setAttribute("rate", rate);
 					request.setAttribute("bankName", bank);
 					request.setAttribute("monthly", String.format("%.2f", m.computePayment(p, a, String.valueOf(rate))));	
-					jsp = "Result.jspx";
 				} 
 				// if there is an interest, compute the payment normally
 				else {
 					request.setAttribute("interest", m.validateInterest(r));
 					request.setAttribute("monthly", String.format("%.2f", m.computePayment(p, a, r)));
-					jsp = "Result.jspx";	
 				}
 			} catch (Exception e) {
 				// display the correct error message

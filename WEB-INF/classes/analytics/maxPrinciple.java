@@ -1,5 +1,6 @@
 package analytics;
 
+import javax.servlet.ServletContext;
 import javax.servlet.annotation.WebListener;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionActivationListener;
@@ -15,24 +16,33 @@ import javax.servlet.http.HttpSessionListener;
  *
  */
 @WebListener
-public class maxPrinciple implements HttpSessionListener, 
-									 HttpSessionAttributeListener, 
-									 HttpSessionActivationListener, 
-									 HttpSessionBindingListener, 
-									 HttpSessionIdListener {
+public class maxPrinciple implements HttpSessionListener, HttpSessionAttributeListener, HttpSessionActivationListener, HttpSessionBindingListener, HttpSessionIdListener {
 
-    /**
+	private double currentMax = 0;
+	HttpSession s;
+	ServletContext sc;
+    
+	/**
      * Default constructor. 
      */
     public maxPrinciple() {
         // TODO Auto-generated constructor stub
     }
-
+    
+	private void updateMax(HttpSessionEvent se, double max) {
+		if (max > currentMax) {
+			currentMax = max;
+		}
+		
+		sc.setAttribute("maxPrinciple", currentMax);
+	}
+	
 	/**
      * @see HttpSessionListener#sessionCreated(HttpSessionEvent)
      */
-    public void sessionCreated(HttpSessionEvent se)  { 
-         System.out.println("Session was created");
+    public void sessionCreated(HttpSessionEvent se)  {
+    	sc = se.getSession().getServletContext();
+    	sc.setAttribute("maxPrinciple", currentMax);
     }
 
 	/**
@@ -67,9 +77,10 @@ public class maxPrinciple implements HttpSessionListener,
      * @see HttpSessionAttributeListener#attributeAdded(HttpSessionBindingEvent)
      */
     public void attributeAdded(HttpSessionBindingEvent se)  { 
-    	String name = se.getName();
-    	String val = String.valueOf(se.getValue());
-        System.out.println("Attribute added: " + name + " " + val);
+    	if (se.getName().equals("principle")) {
+        	String val = String.valueOf(se.getSession().getAttribute("principle"));
+            updateMax(se, Double.parseDouble(val)); 
+        }	 	
     }
 
 	/**
@@ -83,9 +94,10 @@ public class maxPrinciple implements HttpSessionListener,
      * @see HttpSessionAttributeListener#attributeReplaced(HttpSessionBindingEvent)
      */
     public void attributeReplaced(HttpSessionBindingEvent se)  { 
-         String name = se.getName();
-         String newVal = String.valueOf(se.getValue());
-         System.out.println("Attribute replaced: " + name + " " + newVal);
+    	if (se.getName().equals("principle")) {
+    		String newVal = String.valueOf(se.getSession().getAttribute("principle"));
+    		updateMax(se, Double.parseDouble(newVal));
+    	}
     }
 
 	/**

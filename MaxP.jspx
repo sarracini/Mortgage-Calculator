@@ -8,10 +8,15 @@
 		omit-xml-declaration="true" />
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>Insert title here</title>
+<title>Analytics</title>
+<meta http-equiv="refresh" content="5"/>
+<link media="screen, print" title="cse4413" type="text/css" href="${pageContext.request.contextPath}/res/mc.css" rel="StyleSheet"/>
 </head>
 <body>
-<p> derp </p>
+<form method="POST" action="">
+Hello Admin, <br/>
+The maximum entered principle so far is $${maxPrinciple}
+</form>
 </body>
 </html>
 </jsp:root>

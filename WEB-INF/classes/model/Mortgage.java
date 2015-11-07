@@ -56,6 +56,7 @@ public class Mortgage
 	
 	public List<String> getBanks() throws Exception {
 		List<String> allBanks = new ArrayList<String>();
+		allBanks.add("Select a bank...");
 		try {
 			List<MortgageBean> banks = dao.getBanks();
 			for (int i = 0; i < banks.size(); i++) {
